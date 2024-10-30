@@ -353,3 +353,24 @@ body {
         font-size: clamp(0.875rem, 2.5vw, 1.25rem);
     }
 }
+
+.error-message {
+    text-align: center;
+    color: #fff;
+    padding: 20px;
+}
+
+.retry-button {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background: linear-gradient(to right, #FFD700, #FFA500);
+    border: none;
+    border-radius: 20px;
+    color:  black;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.retry-button:hover {
+    transform: scale(1.05);
+}
