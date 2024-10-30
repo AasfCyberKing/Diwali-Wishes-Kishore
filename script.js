@@ -170,16 +170,16 @@ async function init() {
             isLoading = false;
 
             // Play background music after loading
-            if (!isMuted) {
-                backgroundMusic.play().then(() => {
-                    console.log('Audio is playing');
-                }).catch(error => {
-                    console.error('Error playing audio:', error);
-                });
-            }
+            backgroundMusic.muted = true; // Start muted
+            backgroundMusic.play().then(() => {
+                console.log('Audio is playing');
+            }).catch(error => {
+                console.error('Error playing audio:', error);
+            });
         }, 500);
     }, 2000);
 }
+
 
 // Utility Functions
 function triggerRandomFirework() {
