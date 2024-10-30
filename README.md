@@ -35,7 +35,7 @@ Follow these instructions to set up the project on your local machine for develo
    ```
 3. **Open the `index.html` file in your preferred web browser**
 
-### 🎶 Usage
+## 🎶 Usage
 
 - Click the sound button to mute/unmute the background music.
 - Use the like button to show your appreciation for the site.
@@ -43,7 +43,7 @@ Follow these instructions to set up the project on your local machine for develo
 - Fill out the wishes form to send your Diwali greetings.
 - Explore the safety guidelines to ensure a safe celebration.
 
-### 🎨 Acknowledgments
+## 🎨 Acknowledgments
 
 - [Toastify](https://github.com/apvarun/toastify-js) - For beautiful toast notifications.
 - [tsParticles](https://particles.js.org/) - For stunning particle effects.
