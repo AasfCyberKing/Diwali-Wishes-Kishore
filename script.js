@@ -169,10 +169,16 @@ async function init() {
             loadingScreen.style.display = 'none';
             isLoading = false;
 
-            // Start playing the background music after loading
-            backgroundMusic.play().catch(error => {
-                console.error('Error playing audio:', error);
-            });
+            // Attempt to play the background music
+            try {
+                backgroundMusic.play().then(() => {
+                    console.log('Audio is playing');
+                }).catch(error => {
+                    console.error('Error playing audio:', error);
+                });
+            } catch (error) {
+                console.error('Error in playing audio:', error);
+            }
         }, 500);
     }, 2000);
 
@@ -196,6 +202,7 @@ function triggerRandomFirework() {
 }
 
 // Event Handlers
+// Event Handlers
 soundToggle.addEventListener('click', () => {
     isMuted = !isMuted;
     backgroundMusic.muted = isMuted;
@@ -204,8 +211,10 @@ soundToggle.addEventListener('click', () => {
         '<i class="fas fa-volume-up"></i>';
 
     // Play audio if unmuted
-    if (!isMuted && !backgroundMusic.paused) {
-        backgroundMusic.play().catch(error => {
+    if (!isMuted) {
+        backgroundMusic.play().then(() => {
+            console.log('Audio is playing after unmuting');
+        }).catch(error => {
             console.error('Error playing audio:', error);
         });
     }
