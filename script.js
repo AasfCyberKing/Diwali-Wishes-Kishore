@@ -168,6 +168,11 @@ async function init() {
         setTimeout(() => {
             loadingScreen.style.display = 'none';
             isLoading = false;
+
+            // Start playing the background music after loading
+            backgroundMusic.play().catch(error => {
+                console.error('Error playing audio:', error);
+            });
         }, 500);
     }, 2000);
 
@@ -197,6 +202,13 @@ soundToggle.addEventListener('click', () => {
     soundToggle.innerHTML = isMuted ? 
         '<i class="fas fa-volume-mute"></i>' : 
         '<i class="fas fa-volume-up"></i>';
+
+    // Play audio if unmuted
+    if (!isMuted && !backgroundMusic.paused) {
+        backgroundMusic.play().catch(error => {
+            console.error('Error playing audio:', error);
+        });
+    }
 });
 
 // Like button event handler
