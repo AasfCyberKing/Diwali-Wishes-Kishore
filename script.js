@@ -3,11 +3,16 @@ const MONGO_URL = "mongodb+srv://Aaru:AaruAaru@cluster0.qthztcs.mongodb.net/?ret
 
 let db;
 
+// Connect to MongoDB
 async function connectToMongo() {
-    const client = new MongoClient(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client.connect();
-    db = client.db('yourDatabaseName'); // Replace with your database name
-    console.log('Connected to MongoDB');
+    try {
+        const client = new MongoClient(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+        await client.connect();
+        db = client.db('yourDatabaseName'); // Replace with your database name
+        console.log('Connected to MongoDB');
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+    }
 }
 
 // Initialize state
@@ -164,41 +169,54 @@ async function initParticles() {
     });
 }
 
-// Initialize the page
-async function init() {
-    await connectToMongo();
-    await loadLikes(); // Load initial likes count
-    await initParticles();
-
-    // Update UI
-    if (hasLiked) {
-        likeBtn.classList.add('liked');
+async function loadLikes() {
+    try {
+        const likesDoc = await db.collection('likes').findOne({});
+        if (likesDoc) {
+            globalLikes.count = likesDoc.count;
+            likesCount.textContent = globalLikes.count;
+        } else {
+            console.warn('No likes document found, initializing to 0.');
+            globalLikes.count = 0; // Initialize to 0 if no document found
+            likesCount.textContent = globalLikes.count;
+            await db.collection('likes').insertOne({ count: 0 }); // Create initial document
+        }
+    } catch (error) {
+        console.error('Error loading likes:', error);
     }
-
-    // Hide loading screen
-    setTimeout(() => {
-        loadingScreen.style.opacity = '0';
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-            isLoading = false;
-
-            // Play background music after loading
-            backgroundMusic.muted = true; // Start muted
-            backgroundMusic.play().then(() => {
-                console.log('Audio is playing');
-            }).catch(error => {
-                console.error('Error playing audio:', error);
-            });
-        }, 500);
-    }, 2000);
 }
 
-// Load likes from MongoDB
-async function loadLikes() {
-    const likesDoc = await db.collection('likes').findOne({});
-    if (likesDoc) {
-        globalLikes.count = likesDoc.count;
-        likesCount.textContent = globalLikes.count;
+// Initialize the page
+async function init() {
+    try {
+        await connectToMongo();
+        await loadLikes(); // Load initial likes count
+        await initParticles();
+
+        // Update UI
+        if (hasLiked) {
+            likeBtn.classList.add('liked');
+        }
+
+        // Hide loading screen
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                isLoading = false;
+
+                // Play background music after loading
+                backgroundMusic.muted = true; // Start muted
+                backgroundMusic.play().then(() => {
+                    console.log('Audio is playing');
+                }).catch(error => {
+                    console.error('Error playing audio:', error);
+                });
+            }, 500);
+        }, 2000);
+    } catch (error) {
+        console.error('Error during initialization:', error);
+        loadingScreen.innerHTML = "Failed to load. Please refresh the page.";
     }
 }
 
