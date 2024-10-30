@@ -1,17 +1,21 @@
 const { MongoClient } = require('mongodb');
-const MONGO_URL = "mongodb+srv://Shiki:xnp9czdVYgpT4KBE@shiki.smrp72r.mongodb.net/";
+const MONGO_URL = "mongodb+srv://Shiki:xnp9czdVYgpT4KBE@shiki.smrp72r.mongodb.net/"; // Replace with your credentials
 
 let db;
 
-// Connect to MongoDB
 async function connectToMongo() {
+    let client;
     try {
-        const client = new MongoClient(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+        client = new MongoClient(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
         await client.connect();
         db = client.db('yourDatabaseName'); // Replace with your database name
         console.log('Connected to MongoDB');
     } catch (error) {
         console.error('Error connecting to MongoDB:', error);
+        throw new Error('Database connection failed');
+    } finally {
+        if (client) {
+        }
     }
 }
 
@@ -37,136 +41,75 @@ const wishesForm = document.getElementById('wishes-form');
 
 // Initialize particles
 async function initParticles() {
-    await tsParticles.load("fireworks", {
-        fullScreen: {
-            enable: false,
-            zIndex: 1
-        },
-        particles: {
-            number: {
-                value: 0
-            },
-            color: {
-                value: ["#FF4500", "#FFD700", "#FFA500", "#FF6347"]
-            },
-            shape: {
-                type: "circle"
-            },
-            opacity: {
-                value: 1,
-                animation: {
-                    enable: true,
-                    minimumValue: 0,
-                    speed: 2,
-                    startValue: "max",
-                    destroy: "min"
-                }
-            },
-            size: {
-                value: { min: 2, max: 4 },
-                animation: {
-                    enable: true,
-                    speed: 5,
-                    minimumValue: 0.1,
-                    sync: true,
-                    startValue: "min",
-                    destroy: "max"
-                }
-            },
-            life: {
-                count: 1
-            },
-            move: {
-                enable: true,
-                gravity: {
-                    enable: true,
-                    acceleration: 10
+    try {
+        await tsParticles.load("fireworks", {
+            fullScreen: { enable: false, zIndex: 1 },
+            particles: {
+                number: { value: 0 },
+                color: { value: ["#FF4500", "#FFD700", "#FFA500", "#FF6347"] },
+                shape: { type: "circle" },
+                opacity: {
+                    value: 1,
+                    animation: { enable: true, minimumValue: 0, speed: 2, startValue: "max", destroy: "min" }
                 },
-                speed: { min: 10, max: 20 },
-                decay: 0.1,
-                direction: "none",
-                straight: false,
-                outModes: {
-                    default: "destroy",
-                    top: "none"
+                size: {
+                    value: { min: 2, max: 4 },
+                    animation: { enable: true, speed: 5, minimumValue: 0.1, sync: true, startValue: "min", destroy: "max" }
+                },
+                life: { count: 1 },
+                move: {
+                    enable: true,
+                    gravity: { enable: true, acceleration: 10 },
+                    speed: { min: 10, max: 20 },
+                    decay: 0.1,
+                    direction: "none",
+                    straight: false,
+                    outModes: { default: "destroy", top: "none" }
                 }
-            }
-        },
-        emitters: {
-            direction: "top",
-            rate: {
-                delay: 0.1,
-                quantity: 1
             },
-            position: {
-                x: 50,
-                y: 100
+            emitters: {
+                direction: "top",
+                rate: { delay: 0.1, quantity: 1 },
+                position: { x: 50, y: 100 }
             }
-        }
-    });
+        });
 
-    await tsParticles.load("sparkles", {
-        fullScreen: {
-            enable: false,
-            zIndex: 1
-        },
-        particles: {
-            number: {
-                value: 30,
-                density: {
-                    enable: true,
-                    value_area: 800
-                }
-            },
-            color: {
-                value: "#FFD700"
-            },
-            shape: {
-                type: "star"
-            },
-            opacity: {
-                value: 0.8,
-                random: true,
-                animation: {
-                    enable: true,
-                    speed: 1,
-                    minimumValue: 0.1,
-                    sync: false
-                }
-            },
-            size: {
-                value: 3,
-                random: true,
-                animation: {
+        await tsParticles.load("sparkles", {
+            fullScreen: { enable: false, zIndex: 1 },
+            particles: {
+                number: { value: 30, density: { enable: true, value_area: 800 } },
+                color: { value: "#FFD700" },
+                shape: { type: "star" },
+                opacity: {
+                    value: 0.8,
+                    random: true,
+                    animation: { enable: true, speed: 1, minimumValue: 0.1, sync: false }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    animation: { enable: true, speed: 2, minimumValue: 0.1, sync: false }
+                },
+                move: {
                     enable: true,
                     speed: 2,
-                    minimumValue: 0.1,
-                    sync: false
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    outModes: "out"
                 }
             },
-            move: {
-                enable: true,
-                speed: 2,
-                direction: "none",
-                random: true,
-                straight: false,
-                outModes: "out"
-            }
-        },
-        interactivity: {
-            detectsOn: "canvas",
-            events: {
-                onHover: {
-                    enable: true,
-                    mode: "repulse"
-                },
-                onClick: {
-                    enable: true,
-                    mode: "push"
+            interactivity: {
+                detectsOn: "canvas",
+                events: {
+                    onHover: { enable: true, mode: "repulse" },
+                    onClick: { enable: true, mode: "push" }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error initializing particles:', error);
+    }
 }
 
 async function loadLikes() {
@@ -222,22 +165,32 @@ async function init() {
 
 // Increment likes in MongoDB
 async function incrementLikes() {
-    const result = await db.collection('likes').findOneAndUpdate(
-        {},
-        { $inc: { count: 1 } },
-        { returnOriginal: false, upsert: true }
-    );
-    return result.value.count;
+    try {
+        const result = await db.collection('likes').findOneAndUpdate(
+            {},
+            { $inc: { count: 1 } },
+            { returnDocument: 'after', upsert: true }
+        );
+        return result.value.count;
+    } catch (error) {
+        console.error('Error incrementing likes:', error);
+        throw new Error('Failed to increment likes');
+    }
 }
 
 // Decrement likes in MongoDB
 async function decrementLikes() {
-    const result = await db.collection('likes').findOneAndUpdate(
-        {},
-        { $inc: { count: -1 } },
-        { returnOriginal: false, upsert: true }
-    );
-    return result.value.count;
+    try {
+        const result = await db.collection('likes').findOneAndUpdate(
+            { count: { $gt: 0 } },
+            { $inc: { count: -1 } },
+            { returnDocument: 'after', upsert: true }
+        );
+        return result.value.count;
+    } catch (error) {
+        console.error('Error decrementing likes:', error);
+        throw new Error('Failed to decrement likes');
+    }
 }
 
 // Utility Functions
@@ -256,20 +209,24 @@ function triggerRandomFirework() {
 }
 
 // Event Handlers
-soundToggle.addEventListener('click', () => {
-    isMuted = !isMuted;
-    backgroundMusic.muted = isMuted;
-    soundToggle.innerHTML = isMuted ? 
-        '<i class="fas fa-volume-mute"></i>' : 
-        '<i class="fas fa-volume-up"></i>';
+soundToggle.addEventListener('click', async () => {
+    try {
+        isMuted = !isMuted;
+        backgroundMusic.muted = isMuted;
+        soundToggle.innerHTML = isMuted ? 
+            '<i class="fas fa-volume-mute"></i>' : 
+            '<i class="fas fa-volume-up"></i>';
 
-    // Play audio if unmuted
-    if (!isMuted) {
-        backgroundMusic.play().then(() => {
-            console.log('Audio is playing after unmuting');
-        }).catch(error => {
-            console.error('Error playing audio:', error);
-        });
+        // Play audio if unmuted
+        if (!isMuted) {
+            backgroundMusic.play().then(() => {
+                console.log('Audio is playing after unmuting');
+            }).catch(error => {
+                console.error('Error playing audio:', error);
+            });
+        }
+    } catch (error) {
+        console.error('Error toggling sound:', error);
     }
 });
 
@@ -373,7 +330,18 @@ wishesForm.addEventListener('submit', async (e) => {
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
     
-    if (!nameInput.value || !messageInput.value) return;
+    if (!nameInput.value || !messageInput.value) {
+        Toastify({
+            text: "Please fill in both name and message fields.",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            style: {
+                background: "linear-gradient(to right, #FF4500, #FF6347)",
+            }
+        }).showToast();
+        return;
+    }
     
     sendBtn.disabled = true;
     sendBtn.textContent = 'Sending...';
