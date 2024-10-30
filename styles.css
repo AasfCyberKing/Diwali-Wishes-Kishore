@@ -1,0 +1,292 @@
+/* Base Styles */
+:root {
+    --primary: #FFD700;
+    --secondary: #FFA500;
+    --accent: #FF4500;
+    --background: #1a1a1a;
+    --text: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: linear-gradient(to bottom, #1a1a2e, #4a1042, #1a1a2e);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    width: 4rem;
+    height: 4rem;
+    border: 4px solid var(--primary);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Container Styles */
+.app-container {
+    position: relative;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.main-content {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* Particles Containers */
+#fireworks,
+#sparkles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* Controls */
+.top-controls {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 50;
+}
+
+.control-btn {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    border: none;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background: rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+/* Header Styles */
+.main-title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    text-align: center;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 800px;
+}
+
+/* Diya Image */
+.diya-container {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    margin: 2rem 0;
+}
+
+.diya-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+    opacity: 0.3;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.diya-image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* Safety Guidelines */
+.safety-guidelines {
+    width: 100%;
+    max-width: 1000px;
+    text-align: center;
+}
+
+.guidelines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.guideline-card {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.guideline-card:hover {
+    transform: scale(1.02);
+}
+
+/* Message Form */
+.message-form {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.message-form input,
+.message-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    background: transparent;
+    border: 1px solid var(--primary);
+    border-radius: 0.5rem;
+    color: white;
+}
+
+.send-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    border: none;
+    border-radius: 9999px;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.send-button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, var(--secondary), var(--accent));
+}
+
+/* Social Links */
+.social-links {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.social-icon {
+    color: white;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+    transform: scale(1.2) rotate(360deg);
+}
+
+.telegram:hover {
+    color: #0088cc;
+}
+
+.instagram:hover {
+    color: #e1306c;
+}
+
+/* Sound Button */
+.sound-button {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    border: none;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    z-index: 50;
+    transition: all 0.3s ease;
+}
+
+.sound-button:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Animations */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.1); opacity: 0.5; }
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.glow-text {
+    animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    50% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.7); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1rem;
+    }
+
+    .diya-container {
+        width: 240px;
+        height: 240px;
+    }
+
+    .guidelines-grid {
+        grid-template-columns: 1fr;
+    }
+}
