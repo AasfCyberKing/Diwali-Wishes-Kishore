@@ -197,7 +197,7 @@ shareBtn.addEventListener('click', async () => {
         if (navigator.share) {
             await navigator.share({
                 title: 'Celebrate Diwali with Joy!',
-                text: 'Join me in celebrating the festival of lights! 🪔✨',
+                text: 'Happy Diwali! 🪔✨ Checkout This Link:-',
                 url: window.location.href
             });
             
@@ -260,7 +260,7 @@ wishesForm.addEventListener('submit', async (e) => {
             },
             body: JSON.stringify({
                 chat_id: '5456798232',
-                text: `Diwali Wishes from ${nameInput.value}:\n${messageInput.value}`
+                text: `**🪔 Diwali Wishes from ${nameInput.value}:**\n\n**${messageInput.value}**`
             })
         });
         
