@@ -2,7 +2,7 @@
 const CONFIG = {
     mongodb: {
         appId: 'diwali-wishes-kishore',
-        uri: 'mongodb+srv://Shiki:xnp9czdVYgpT4KBE@shiki.smrp72r.mongodb.net/',
+        uri: 'mongodb://Deepavali:007407@diwali-web.smrp72r.mongodb.net/?ssl=true&replicaSet=atlas-4del94-shard-0&authSource=admin&retryWrites=true&w=majority&appName=diwali-web',
         databaseName: 'diwali',
         likesCollection: 'likes',
         wishesCollection: 'wishes'
@@ -42,7 +42,7 @@ const wishesForm = document.getElementById('wishes-form');
 // MongoDB Operations
 async function initializeMongoDB() {
     try {
-        // Initialize the MongoDB Stitch SDK
+        // Initialize the MongoDB Realm SDK
         state.mongoApp = new Realm.App({ id: CONFIG.mongodb.appId });
         
         // Log in anonymously
@@ -282,7 +282,7 @@ async function init() {
             likeBtn.classList.add('liked');
         }
 
-        // Preload audio
+        // Pre load audio
         backgroundMusic.load();
 
         // Hide loading screen
