@@ -2,7 +2,7 @@
 const CONFIG = {
     mongodb: {
         appId: 'diwali-wishes-kishore',
-        uri: 'mongodb://Deepavali:007407@diwali-web.smrp72r.mongodb.net/?ssl=true&replicaSet=atlas-4del94-shard-0&authSource=admin&retryWrites=true&w=majority&appName=diwali-web',
+        uri: 'mongodb+srv://Deepavali:007407@diwali-web.thvyg.mongodb.net/?retryWrites=true&w=majority&appName=diwali-web"
         databaseName: 'diwali',
         likesCollection: 'likes',
         wishesCollection: 'wishes'
