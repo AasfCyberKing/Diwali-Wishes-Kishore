@@ -1,6 +1,6 @@
 // Initialize state
 let isLoading = true;
-let isMuted = false;
+let isMuted = true;
 let likes = 0; // Initialize likes count
 let hasLiked = false; // Track if the user has liked
 
@@ -155,7 +155,6 @@ async function initParticles() {
 // Initialize the page
 async function init() {
     await initParticles();
-    
     // Update UI
     likesCount.textContent = globalLikes.count; // Use globalLikes count
     if (hasLiked) {
