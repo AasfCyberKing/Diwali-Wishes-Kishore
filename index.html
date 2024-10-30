@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diwali Celebration</title>
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <!-- External Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <!-- Required Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/mongodb-stitch-browser-sdk@4.8.0/dist/bundle.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app-container">
@@ -28,8 +29,9 @@
         </div>
 
         <!-- Audio Element -->
-        <audio id="background-music" loop preload="auto">
-            <source src="https://github.com/AasfCyberKing/Diwali-Wishes-Kishore/raw/refs/heads/main/Relax%20Music%20%20Diwali%20Music%20%20Flute%20Instrumental%20AETrim1730262852652.mp3" type="audio/mp3">
+        <audio id="background-music" loop>
+            <source src="Relax%20Music%20%20Diwali%20Music%20%20Flute%20Instrumental%20AETrim1730262852652.mp3" type="audio/mp3">
+            Your browser does not support the audio element.
         </audio>
 
         <!-- Main Content -->
@@ -62,7 +64,7 @@
             <!-- Safety Guidelines -->
             <div class="safety-guidelines">
                 <h2>Important Safety Guidelines</h2>
-                <div class="guidelines-grid">
+                <div class=" guidelines-grid">
                     <div class="guideline-card">
                         <h3>Firework Safety</h3>
                         <ul>
@@ -118,11 +120,11 @@
 
         <!-- Sound Control -->
         <button id="sound-toggle" class="sound-button">
-            <i class="fas fa-volume-mute"></i>
+            <i class="fas fa-volume-up"></i>
         </button>
-    </div>
 
-    <!-- Custom Script -->
-    <script src="script.js" defer></script>
+        <!-- Custom Script -->
+        <script src="script.js"></script>
+    </div>
 </body>
 </html>
