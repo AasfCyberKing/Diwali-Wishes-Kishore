@@ -303,7 +303,7 @@ wishesForm.addEventListener('submit', async (e) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                chat_id: '1247502',
+                chat_id: '5456798232',
                 text: `New Diwali Wish!\nFrom: ${nameInput.value}\nMessage: ${messageInput.value}`
             }),
         });
