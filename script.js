@@ -190,12 +190,15 @@ soundToggle.addEventListener('click', () => {
     isMuted = !isMuted;
     backgroundMusic.muted = isMuted;
     soundToggle.innerHTML = isMuted ? 
-        '<i class="icon-volume-x"></i>' : 
-        '<i class="icon-volume"></i>';
+        '<i class="fas fa-volume-mute"></i>' : 
+        '<i class="fas fa-volume-up"></i>';
 });
 
+// Event Handlers
 likeBtn.addEventListener('click', () => {
+    // Toggle the like state
     if (!hasLiked) {
+        // User likes the post
         likes++;
         hasLiked = true;
         localStorage.setItem('diwalilikes', likes);
@@ -211,6 +214,24 @@ likeBtn.addEventListener('click', () => {
             position: "center",
             style: {
                 background: "linear-gradient(to right, #FFD700, #FFA500)",
+            }
+        }).showToast();
+    } else {
+        // User unlikes the post
+        likes--;
+        hasLiked = false;
+        localStorage.setItem('diwalilikes', likes);
+        localStorage.setItem('hasLikedDiwali', 'false');
+        likesCount.textContent = likes;
+        likeBtn.classList.remove('liked');
+
+        Toastify({
+            text: "You have removed your like. 😢",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            style: {
+                background: "linear-gradient(to right, #FF4500, #FF6347)",
             }
         }).showToast();
     }
