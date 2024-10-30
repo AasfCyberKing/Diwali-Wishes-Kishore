@@ -109,12 +109,13 @@ body {
     max-width: 800px;
 }
 
-/* Diya Image */
 .diya-container {
     position: relative;
-    width: 320px;
-    height: 320px;
+    width: 320px; /* Width of the container */
+    height: 320px; /* Height of the container */
     margin: 2rem 0;
+    overflow: hidden; /* Ensure anything outside is hidden */
+    border-radius: 50%; /* Make the container circular */
 }
 
 .diya-glow {
@@ -128,12 +129,11 @@ body {
 
 .diya-image {
     position: relative;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 50%;
+    width: 100%; /* Fill the container */
+    height: 100%; /* Fill the container */
+    object-fit: cover; /* Cover the container, maintaining aspect ratio */
+    border-radius: 50%; /* Make the image circular */
 }
-
 /* Safety Guidelines */
 .safety-guidelines {
     width: 100%;
