@@ -152,7 +152,7 @@ likeBtn.addEventListener('click', async () => {
         }
     } catch (error) {
         console.error('Error liking:', error);
-        showToast('Failed to like. Please try again.', 'error');
+        showToast(`Failed to like. Please try again. ${error}`);
     }
 });
 
