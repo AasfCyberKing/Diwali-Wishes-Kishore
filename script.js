@@ -1,187 +1,311 @@
-// Configuration
-const CONFIG = {
-    apiUrl: 'https://kishoredxd.vercel.app/api',
-    telegram: {
-        botToken: '6690815586:AAFh5kcrmt7Heggp-Syg66FDlGP9idUzQEI',
-        chatId: '5456798232'
-    }
-};
+let isLoading = true;
+let isMuted = true;
 
-// Initialize state
-let state = {
-    isLoading: true,
-    isMuted: true,
-    likes: 0,
-    hasLiked: false,
-    userId: localStorage.getItem('user-id') || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-};
-
-// Save user ID if not exists
-if (!localStorage.getItem('user-id')) {
-    localStorage.setItem('user-id', state.userId);
-}
-
-// DOM Elements
 const loadingScreen = document.getElementById('loading-screen');
 const backgroundMusic = document.getElementById('background-music');
 const soundToggle = document.getElementById('sound-toggle');
-const likeBtn = document.getElementById('like-btn');
-const likesCount = document.getElementById('likes-count');
 const shareBtn = document.getElementById('share-btn');
 const wishesForm = document.getElementById('wishes-form');
 
-// API Functions
-async function getLikes() {
-    try {
-        const response = await fetch(`${CONFIG.apiUrl}/likes`);
-        const data = await response.json();
-        return data.count || 0;
-    } catch (error) {
-        console.error('Error getting likes:', error);
-        return 0;
-    }
-}
-
-async function updateLikes(increment = true) {
-    try {
-        const response = await fetch(`${CONFIG.apiUrl}/likes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+async function initParticles() {
+    await tsParticles.load("fireworks", {
+        fullScreen: {
+            enable: false,
+            zIndex: 1
+        },
+        particles: {
+            number: {
+                value: 0
             },
-            body: JSON.stringify({
-                increment
-            }),
-        });
-        const data = await response.json();
-        return data.count || 0;
-    } catch (error) {
-        console.error('Error updating likes:', error);
-        throw error;
-    }
-}
-
-async function saveWish(name, message) {
-    try {
-        await fetch(`${CONFIG.apiUrl}/wishes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+            color: {
+                value: ["#FF4500", "#FFD700", "#FFA500", "#FF6347"]
             },
-            body: JSON.stringify({
-                userId: state.userId,
-                name,
-                message
-            }),
-        });
-    } catch (error) {
-        console.error('Error saving wish:', error);
-        throw error;
-    }
+            shape: {
+                type: "circle"
+            },
+            opacity: {
+                value: 1,
+                animation: {
+                    enable: true,
+                    minimumValue: 0,
+                    speed: 2,
+                    startValue: "max",
+                    destroy: "min"
+                }
+            },
+            size: {
+                value: { min: 2, max: 4 },
+                animation: {
+                    enable: true,
+                    speed: 5,
+                    minimumValue: 0.1,
+                    sync: true,
+                    startValue: "min",
+                    destroy: "max"
+                }
+            },
+            life: {
+                count: 1
+            },
+            move: {
+                enable: true,
+                gravity: {
+                    enable: true,
+                    acceleration: 10
+                },
+                speed: { min: 10, max: 20 },
+                decay: 0.1,
+                direction: "none",
+                straight: false,
+                outModes: {
+                    default: "destroy",
+                    top: "none"
+                }
+            }
+        },
+        emitters: {
+            direction: "top",
+            rate: {
+                delay: 0.1,
+                quantity: 1
+            },
+            position: {
+                x: 50,
+                y: 100
+            }
+        }
+    });
+
+    await tsParticles.load("sparkles", {
+        fullScreen: {
+            enable: false,
+            zIndex: 1
+        },
+        particles: {
+            number: {
+                value: 30,
+                density: {
+                    enable: true,
+                    value_area: 800
+                }
+            },
+            color: {
+                value: "#FFD700"
+            },
+            shape: {
+                type: "star"
+            },
+            opacity: {
+                value: 0.8,
+                random: true,
+                animation: {
+                    enable: true,
+                    speed: 1,
+                    minimumValue: 0.1,
+                    sync: false
+                }
+            },
+            size: {
+                value: 3,
+                random: true,
+                animation: {
+                    enable: true,
+                    speed: 2,
+                    minimumValue: 0.1,
+                    sync: false
+                }
+            },
+            move: {
+                enable: true,
+                speed: 2,
+                direction: "none",
+                random: true,
+                straight: false,
+                outModes: "out"
+            }
+        },
+        interactivity: {
+            detectsOn: "canvas",
+            events: {
+                onHover: {
+                    enable: true,
+                    mode: "repulse"
+                },
+                onClick: {
+                    enable: true,
+                    mode: "push"
+                }
+            }
+        }
+    });
 }
 
-// UI Functions
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    toast.style.background = type === 'success' ? 
-        'linear-gradient(to right, #FFD700, #FFA500)' : 
-        'linear-gradient(to right, #FF4500, #FF6347)';
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
-}
-
-// Initialize the page
 async function init() {
-    try {
-        // Get initial likes count
-        state.likes = await getLikes();
-        likesCount.textContent = state.likes;
+    await initParticles();
 
-        // Hide loading screen
+    setTimeout(() => {
+        loadingScreen.style.opacity = '0';
         setTimeout(() => {
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                state.isLoading = false;
-            }, 500);
-        }, 1500);
+            loadingScreen.style.display = 'none';
+            isLoading = false;
 
-    } catch (error) {
-        console.error('Error during initialization:', error);
-        loadingScreen.innerHTML = `
-            <div class="error-message">
-                Failed to load. Please refresh the page.<br>
-                <small>${error.message}</small>
-                <button onclick="window.location.reload()" class="retry-button">
-                    Retry
-                </button>
-            </div>
-        `;
-    }
+            // Play background music after loading
+            backgroundMusic.muted = true; // Start muted
+            backgroundMusic.play().then(() => {
+                console.log('Audio is playing');
+            }).catch(error => {
+                console.error('Error playing audio:', error);
+            });
+        }, 500);
+    }, 2000);
 }
 
-// Event Handlers
+
+function triggerRandomFirework() {
+    if (isLoading) return;
+    
+    const x = Math.random();
+    const y = Math.random() * 0.5;
+    
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { x, y },
+        colors: ['#FFD700', '#FFA500', '#FF4500']
+    });
+}
+
 soundToggle.addEventListener('click', () => {
-    state.isMuted = !state.isMuted;
-    backgroundMusic.muted = state.isMuted;
-    soundToggle.innerHTML = state.isMuted ? 
+    isMuted = !isMuted;
+    backgroundMusic.muted = isMuted;
+    soundToggle.innerHTML = isMuted ? 
         '<i class="fas fa-volume-mute"></i>' : 
         '<i class="fas fa-volume-up"></i>';
 
-    if (!state.isMuted) {
-        backgroundMusic.play().catch(console.error);
+    if (!isMuted) {
+        backgroundMusic.play().then(() => {
+            console.log('Audio is playing after unmuting');
+        }).catch(error => {
+            console.error('Error playing audio:', error);
+        });
     }
 });
 
-likeBtn.addEventListener('click', async () => {
+// Share button event handler
+shareBtn.addEventListener('click', async () => {
     try {
-        if (!state.hasLiked) {
-            // User likes
-            const newLikes = await updateLikes(true);
-            state.likes = newLikes;
-            likesCount.textContent = state.likes;
-            state.hasLiked = true;
-            likeBtn.disabled = true;
-            showToast('Thank you for liking!');
+        if (navigator.share) {
+            await navigator.share({
+                title: 'Celebrate Diwali with Joy!',
+                text: 'Join me in celebrating the festival of lights! 🪔✨',
+                url: window.location.href
+            });
+            
+            Toastify({
+                text: "Thanks for sharing the joy!",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #FFD700, #FFA500)",
+                }
+            }).showToast();
+        } else {
+            await navigator.clipboard.writeText(window.location.href);
+            
+            Toastify({
+                text: "Link copied to clipboard! Share the festivities!",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #FFD700, #FFA500)",
+                }
+            }).showToast();
         }
+        triggerRandomFirework();
     } catch (error) {
-        console.error('Error liking:', error);
-        showToast(`Failed to like. Please try again. ${error}`);
+        console.error('Error sharing:', error);
+        
+        Toastify({
+            text: "Error sharing. Please try again.",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            style: {
+                background: "linear-gradient(to right, #FF4500, #FF6347)",
+            }
+        }).showToast();
     }
 });
 
-shareBtn.addEventListener('click', () => {
-    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=Happy%20Diwali!`;
-    window.open(telegramUrl, '_blank');
-});
-
-wishesForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
+// Wishes form submission event handler
+wishesForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
     const nameInput = document.getElementById('name-input');
     const messageInput = document.getElementById('message-input');
-    const name = nameInput.value.trim();
-    const message = messageInput.value.trim();
-
-    if (name && message) {
-        try {
-            await saveWish(name, message);
+    const sendBtn = document.getElementById('send-btn');
+    
+    if (!nameInput.value || !messageInput.value) return;
+    
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending...';
+    
+    try {
+        const response = await fetch('https://api.telegram.org/bot6690815586:AAFh5kcrmt7Heggp-Syg66FDlGP9idUzQEI/sendMessage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: '5456798232',
+                text: `Diwali Wishes from ${nameInput.value}:\n${messageInput.value}`
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok) {
             nameInput.value = '';
             messageInput.value = '';
-            showToast('Wish saved successfully!');
-        } catch (error) {
-            console.error('Error saving wish:', error);
-            showToast('Failed to save wish. Please try again.', 'error');
+            triggerRandomFirework();
+            Toastify({
+                text: "Your Diwali wishes have been sent! 🪔✨",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #FFD700, #FFA500)",
+                }
+            }).showToast();
+        } else {
+            Toastify({
+                text: "Error sending wishes. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #FF4500, #FF6347)",
+                }
+            }).showToast();
         }
-    } else {
-        showToast('Please fill in both name and message fields.', 'error');
+    } catch (error) {
+        console.error('Error sending wishes:', error);
+        
+        Toastify({
+            text: "Error sending wishes. Please try again.",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            style: {
+                background: "linear-gradient(to right, #FF4500, #FF6347)",
+            }
+        }).showToast();
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Send Diwali Wishes';
     }
 });
 
-// Initialize the page
 init();
