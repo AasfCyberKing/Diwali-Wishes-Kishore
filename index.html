@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diwali Celebration</title>
+    
+    <!-- External Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Particles Containers -->
+        <div id="fireworks"></div>
+        <div id="sparkles"></div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Audio Element -->
+        <audio id="background-music" loop>
+            <source src="/placeholder.mp3" type="audio/mp3">
+        </audio>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Controls -->
+            <div class="top-controls">
+                <button id="share-btn" class="control-btn">
+                    <i class="icon-share"></i>
+                </button>
+                <button id="like-btn" class="control-btn">
+                    <i class="icon-heart"></i>
+                    <span id="likes-count">0</span>
+                </button>
+            </div>
+
+            <!-- Header Section -->
+            <div class="header-section">
+                <h1 class="main-title glow-text">Celebrate Diwali with Love! 🪔</h1>
+                <p class="subtitle">
+                    Let's illuminate our hearts with joy, spread happiness, and create beautiful memories with our loved ones on this auspicious festival of lights! ✨
+                </p>
+            </div>
+
+            <!-- Diya Image -->
+            <div class="diya-container">
+                <div class="diya-glow"></div>
+                <img src="/placeholder.svg?height=320&width=320" alt="Diwali Celebration" class="diya-image">
+            </div>
+
+            <!-- Safety Guidelines -->
+            <div class="safety-guidelines">
+                <h2>Important Safety Guidelines</h2>
+                <div class="guidelines-grid">
+                    <div class="guideline-card">
+                        <h3>Firework Safety</h3>
+                        <ul>
+                            <li>Never hold lit fireworks in your hands</li>
+                            <li>Keep a bucket of water nearby</li>
+                            <li>Light fireworks in open areas only</li>
+                            <li>Wear protective gear when handling fireworks</li>
+                            <li>Dispose of used fireworks properly</li>
+                        </ul>
+                    </div>
+                    <div class="guideline-card">
+                        <h3>Community Guidelines</h3>
+                        <ul>
+                            <li>Be mindful of noise levels</li>
+                            <li>Protect animals from loud sounds</li>
+                            <li>Respect quiet hours</li>
+                            <li>Clean up after celebrations</li>
+                            <li>Help elderly neighbors celebrate safely</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Form -->
+            <div class="message-form">
+                <h2>Send Your Diwali Wishes</h2>
+                <form id="wishes-form">
+                    <input type="text" id="name-input" placeholder="Your Name" required>
+                    <textarea id="message-input" placeholder="Share your Diwali message..." required></textarea>
+                    <button type="submit" id="send-btn" class="send-button">
+                        Send Diwali Wishes
+                        <i class="icon-send"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Social Links -->
+            <div class="social-links">
+                <p>Connect with Kishore:</p>
+                <div class="social-icons">
+                    <a href="https://t.me/kishoredxd" target="_blank" rel="noopener noreferrer" class="social-icon telegram">
+                        <i class="icon-telegram"></i>
+                    </a>
+                    <a href="https://www.instagram.com/kishoredxd" target="_blank" rel="noopener noreferrer" class="social-icon instagram">
+                        <i class="icon-instagram"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <p class="footer-text">Created with ❤️ by Kishore</p>
+        </div>
+
+        <!-- Sound Control -->
+        <button id="sound-toggle" class="sound-button">
+            <i class="icon-volume"></i>
+        </button>
+    </div>
+
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+</body>
+</html>
