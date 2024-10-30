@@ -1,8 +1,13 @@
 // Initialize state
 let isLoading = true;
 let isMuted = false;
-let likes = parseInt(localStorage.getItem('diwalilikes')) || 0;
-let hasLiked = localStorage.getItem('hasLikedDiwali') === 'true';
+let likes = 0; // Initialize likes count
+let hasLiked = false; // Track if the user has liked
+
+// Global object to simulate server-side storage (for demonstration purposes)
+const globalLikes = {
+    count: 0
+};
 
 // DOM Elements
 const loadingScreen = document.getElementById('loading-screen');
@@ -47,7 +52,7 @@ async function initParticles() {
                     speed: 5,
                     minimumValue: 0.1,
                     sync: true,
-                    startValue:  "min",
+                    startValue: "min",
                     destroy: "max"
                 }
             },
@@ -152,7 +157,7 @@ async function init() {
     await initParticles();
     
     // Update UI
-    likesCount.textContent = likes;
+    likesCount.textContent = globalLikes.count; // Use globalLikes count
     if (hasLiked) {
         likeBtn.classList.add('liked');
     }
@@ -177,7 +182,7 @@ function triggerRandomFirework() {
     const x = Math.random();
     const y = Math.random() * 0.5;
     
-    confetti({
+    conf etti({
         particleCount: 100,
         spread: 70,
         origin: { x, y },
@@ -194,16 +199,14 @@ soundToggle.addEventListener('click', () => {
         '<i class="fas fa-volume-up"></i>';
 });
 
-// Event Handlers
+// Like button event handler
 likeBtn.addEventListener('click', () => {
     // Toggle the like state
     if (!hasLiked) {
         // User likes the post
-        likes++;
+        globalLikes.count++; // Increment global likes count
         hasLiked = true;
-        localStorage.setItem('diwalilikes', likes);
-        localStorage.setItem('hasLikedDiwali', 'true');
-        likesCount.textContent = likes;
+        likesCount.textContent = globalLikes.count; // Update UI
         likeBtn.classList.add('liked');
         triggerRandomFirework();
         
@@ -218,11 +221,11 @@ likeBtn.addEventListener('click', () => {
         }).showToast();
     } else {
         // User unlikes the post
-        likes--;
+        if (globalLikes.count > 0) {
+            globalLikes.count--; // Decrement global likes count
+        }
         hasLiked = false;
-        localStorage.setItem('diwalilikes', likes);
-        localStorage.setItem('hasLikedDiwali', 'false');
-        likesCount.textContent = likes;
+        likesCount.textContent = globalLikes.count; // Update UI
         likeBtn.classList.remove('liked');
 
         Toastify({
@@ -237,6 +240,7 @@ likeBtn.addEventListener('click', () => {
     }
 });
 
+// Share button event handler
 shareBtn.addEventListener('click', async () => {
     try {
         if (navigator.share) {
@@ -284,6 +288,7 @@ shareBtn.addEventListener('click', async () => {
     }
 });
 
+// Wishes form submission event handler
 wishesForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -323,7 +328,7 @@ wishesForm.addEventListener('submit', async (e) => {
                 }
             }).showToast();
         } else {
-            throw new Error('Failed to send message');
+            throw new Error(' Failed to send message');
         }
     } catch (error) {
         console.error('Error sending message:', error);
