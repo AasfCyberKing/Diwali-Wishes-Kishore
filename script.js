@@ -168,22 +168,8 @@ async function init() {
         setTimeout(() => {
             loadingScreen.style.display = 'none';
             isLoading = false;
-
-            // Attempt to play the background music
-            try {
-                backgroundMusic.play().then(() => {
-                    console.log('Audio is playing');
-                }).catch(error => {
-                    console.error('Error playing audio:', error);
-                });
-            } catch (error) {
-                console.error('Error in playing audio:', error);
-            }
         }, 500);
     }, 2000);
-
-    // Start random fireworks
-    setInterval(triggerRandomFirework, 3000);
 }
 
 // Utility Functions
@@ -201,7 +187,6 @@ function triggerRandomFirework() {
     });
 }
 
-// Event Handlers
 // Event Handlers
 soundToggle.addEventListener('click', () => {
     isMuted = !isMuted;
@@ -371,3 +356,12 @@ wishesForm.addEventListener('submit', async (e) => {
 
 // Initialize the page
 init();
+
+// Play audio when the page is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    backgroundMusic.play().then(() => {
+        console.log('Audio is playing');
+    }).catch(error => {
+        console.error('Error playing audio:', error);
+    });
+});
