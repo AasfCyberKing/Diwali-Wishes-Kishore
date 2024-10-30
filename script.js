@@ -1,3 +1,15 @@
+const { MongoClient } = require('mongodb');
+const MONGO_URL = "mongodb+srv://Aaru:AaruAaru@cluster0.qthztcs.mongodb.net/?retryWrites=true&w=majority";
+
+let db;
+
+async function connectToMongo() {
+    const client = new MongoClient(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+    db = client.db('yourDatabaseName'); // Replace with your database name
+    console.log('Connected to MongoDB');
+}
+
 // Initialize state
 let isLoading = true;
 let isMuted = true;
@@ -154,9 +166,11 @@ async function initParticles() {
 
 // Initialize the page
 async function init() {
+    await connectToMongo();
+    await loadLikes(); // Load initial likes count
     await initParticles();
+
     // Update UI
-    likesCount.textContent = globalLikes.count; // Use globalLikes count
     if (hasLiked) {
         likeBtn.classList.add('liked');
     }
@@ -179,6 +193,34 @@ async function init() {
     }, 2000);
 }
 
+// Load likes from MongoDB
+async function loadLikes() {
+    const likesDoc = await db.collection('likes').findOne({});
+    if (likesDoc) {
+        globalLikes.count = likesDoc.count;
+        likesCount.textContent = globalLikes.count;
+    }
+}
+
+// Increment likes in MongoDB
+async function incrementLikes() {
+    const result = await db.collection('likes').findOneAndUpdate(
+        {},
+        { $inc: { count: 1 } },
+        { returnOriginal: false, upsert: true }
+    );
+    return result.value.count;
+}
+
+// Decrement likes in MongoDB
+async function decrementLikes() {
+    const result = await db.collection('likes').findOneAndUpdate(
+        {},
+        { $inc: { count: -1 } },
+        { returnOriginal: false, upsert: true }
+    );
+    return result.value.count;
+}
 
 // Utility Functions
 function triggerRandomFirework() {
@@ -214,43 +256,46 @@ soundToggle.addEventListener('click', () => {
 });
 
 // Like button event handler
-likeBtn.addEventListener('click', () => {
-    // Toggle the like state
-    if (!hasLiked) {
-        // User likes the post
-        globalLikes.count++; // Increment global likes count
-        hasLiked = true;
-        likesCount.textContent = globalLikes.count; // Update UI
-        likeBtn.classList.add('liked');
-        triggerRandomFirework();
-        
-        Toastify({
-            text: "Thanks for spreading the Diwali joy! 🪔✨",
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            style: {
-                background: "linear-gradient(to right, #FFD700, #FFA500)",
-            }
-        }).showToast();
-    } else {
-        // User unlikes the post
-        if (globalLikes.count > 0) {
-            globalLikes.count--; // Decrement global likes count
-        }
-        hasLiked = false;
-        likesCount.textContent = globalLikes.count; // Update UI
-        likeBtn.classList.remove('liked');
+likeBtn.addEventListener('click', async () => {
+    try {
+        if (!hasLiked) {
+            // User likes the post
+            globalLikes.count = await incrementLikes();
+            hasLiked = true;
+            likesCount.textContent = globalLikes.count; // Update UI
+            likeBtn.classList.add('liked');
+            triggerRandomFirework();
 
-        Toastify({
-            text: "You have removed your like. 😢",
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            style: {
-                background: "linear-gradient(to right, #FF4500, #FF6347)",
+            Toastify({
+                text: "Thanks for spreading the Diwali joy! 🪔✨",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #FFD700, #FFA500)",
+                }
+            }).showToast();
+        } else {
+            // User unlikes the post
+            if (globalLikes.count > 0) {
+                globalLikes.count = await decrementLikes();
+                hasLiked = false;
+                likesCount.textContent = globalLikes.count; // Update UI
+                likeBtn.classList.remove('liked');
+
+                Toastify({
+                    text: "You have removed your like. 😢",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "center",
+                    style: {
+                        background: "linear-gradient(to right, #FF4500, #FF6347)",
+                    }
+                }).showToast();
             }
-        }).showToast();
+        }
+    } catch (error) {
+        console.error('Error updating likes:', error);
     }
 });
 
