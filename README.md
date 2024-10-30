@@ -1,8 +1,7 @@
+![Diwali Celebration](https://github.com/AasfCyberKing/Diwali-Wishes-Kishore/raw/refs/heads/main/ee810714b55609fb492abd6f3bdd756a%20(1).jpg) 
 # 🎉 Diwali Celebration Website 🪔
 
 Welcome to the **Diwali Celebration Website**! This interactive web application allows you to celebrate the festival of lights with joy, share your wishes, and enjoy festive music and animations.
-
-![Diwali Celebration](https://example.com/path/to/your/image.png) <!-- Replace with an actual image URL -->
 
 ## 🌟 Features
 
