@@ -2,11 +2,10 @@
 const CONFIG = {
     mongodb: {
         appId: 'diwali-wishes-kishore',
-        clusterName: 'shiki',
+        uri: 'mongodb+srv://Shiki:xnp9czdVYgpT4KBE@shiki.smrp72r.mongodb.net/',
         databaseName: 'diwali',
         likesCollection: 'likes',
-        wishesCollection: 'wishes',
-        uri: 'mongodb+srv://Shiki:xnp9czdVYgpT4KBE@shiki.smrp72r.mongodb.net/'
+        wishesCollection: 'wishes'
     },
     telegram: {
         botToken: '6690815586:AAFh5kcrmt7Heggp-Syg66FDlGP9idUzQEI',
@@ -21,8 +20,9 @@ let state = {
     likes: 0,
     hasLiked: false,
     userId: localStorage.getItem('user-id') || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    mongoApp: null,
     mongoClient: null,
-    db: null
+    mongoDb: null
 };
 
 // Save user ID if not exists
@@ -42,32 +42,24 @@ const wishesForm = document.getElementById('wishes-form');
 // MongoDB Operations
 async function initializeMongoDB() {
     try {
-        // Initialize the MongoDB client
-        const { MongoClient } = require('mongodb');
-        const client = new MongoClient(CONFIG.mongodb.uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            serverApi: { version: '1', strict: true, deprecationErrors: true }
-        });
-
-        // Connect to MongoDB
-        await client.connect();
-        console.log('Connected to MongoDB');
-
-        // Set up database and collections
-        const db = client.db(CONFIG.mongodb.databaseName);
+        // Initialize the MongoDB Stitch SDK
+        state.mongoApp = new Realm.App({ id: CONFIG.mongodb.appId });
+        
+        // Log in anonymously
+        const credentials = Realm.Credentials.anonymous();
+        state.mongoClient = await state.mongoApp.logIn(credentials);
+        
+        // Get database reference
+        state.mongoDb = state.mongoClient.mongoClient("mongodb-atlas").db(CONFIG.mongodb.databaseName);
         
         // Initialize likes collection if empty
-        const likesCollection = db.collection(CONFIG.mongodb.likesCollection);
+        const likesCollection = state.mongoDb.collection(CONFIG.mongodb.likesCollection);
         const likesDoc = await likesCollection.findOne({});
         if (!likesDoc) {
             await likesCollection.insertOne({ count: 0, users: [] });
         }
 
-        // Store client and db in state
-        state.mongoClient = client;
-        state.db = db;
-
+        console.log('MongoDB initialized successfully');
         return true;
     } catch (error) {
         console.error('MongoDB initialization error:', error);
@@ -77,7 +69,7 @@ async function initializeMongoDB() {
 
 async function getLikes() {
     try {
-        const collection = state.db.collection(CONFIG.mongodb.likesCollection);
+        const collection = state.mongoDb.collection(CONFIG.mongodb.likesCollection);
         const doc = await collection.findOne({});
         return doc?.count || 0;
     } catch (error) {
@@ -88,7 +80,7 @@ async function getLikes() {
 
 async function updateLikes(increment = true) {
     try {
-        const collection = state.db.collection(CONFIG.mongodb.likesCollection);
+        const collection = state.mongoDb.collection(CONFIG.mongodb.likesCollection);
         const update = increment
             ? { 
                 $inc: { count: 1 },
@@ -105,7 +97,7 @@ async function updateLikes(increment = true) {
             { returnDocument: 'after', upsert: true }
         );
 
-        return result.value.count;
+        return result?.count || 0;
     } catch (error) {
         console.error('Error updating likes:', error);
         throw error;
@@ -114,7 +106,7 @@ async function updateLikes(increment = true) {
 
 async function checkUserLiked() {
     try {
-        const collection = state.db.collection(CONFIG.mongodb.likesCollection);
+        const collection = state.mongoDb.collection(CONFIG.mongodb.likesCollection);
         const doc = await collection.findOne({ users: state.userId });
         return !!doc;
     } catch (error) {
@@ -125,7 +117,7 @@ async function checkUserLiked() {
 
 async function saveWish(name, message) {
     try {
-        const collection = state.db.collection(CONFIG.mongodb.wishesCollection);
+        const collection = state.mongoDb.collection(CONFIG.mongodb.wishesCollection);
         await collection.insertOne({
             userId: state.userId,
             name,
@@ -136,6 +128,17 @@ async function saveWish(name, message) {
         console.error('Error saving wish:', error);
         throw error;
     }
+}
+
+// Load MongoDB Realm SDK
+function loadMongoDBRealm() {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/realm-web@1.7.1/dist/bundle.iife.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('Failed to load MongoDB Realm'));
+        document.head.appendChild(script);
+    });
 }
 
 // Telegram Notifications
@@ -260,6 +263,9 @@ function triggerRandomFirework() {
 // Initialize the page
 async function init() {
     try {
+        // Load MongoDB Realm SDK
+        await loadMongoDBRealm();
+        
         // Initialize MongoDB
         await initializeMongoDB();
         
@@ -417,9 +423,9 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Cleanup on page unload
-window.addEventListener('beforeunload', async () => {
+window.addEventListener('beforeunload', () => {
     if (state.mongoClient) {
-        await state.mongoClient.close();
+        state.mongoClient.close();
     }
 });
 
