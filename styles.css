@@ -30,6 +30,7 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    transition: opacity 0.5s ease;
 }
 
 .loading-spinner {
@@ -92,6 +93,10 @@ body {
 .control-btn:hover {
     background: rgba(0, 0, 0, 0.4);
     transform: scale(1.1);
+}
+
+.control-btn.liked {
+    color: var(--accent);
 }
 
 /* Header Styles */
@@ -161,6 +166,16 @@ body {
     transform: scale(1.02);
 }
 
+.guideline-card ul {
+    list-style-position: inside;
+    text-align: left;
+    margin-top: 1rem;
+}
+
+.guideline-card li {
+    margin-bottom: 0.5rem;
+}
+
 /* Message Form */
 .message-form {
     width: 100%;
@@ -177,10 +192,18 @@ body {
     width: 100%;
     padding: 0.75rem;
     margin-bottom: 1rem;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--primary);
     border-radius: 0.5rem;
     color: white;
+    transition: all 0.3s ease;
+}
+
+.message-form input:focus,
+.message-form textarea:focus {
+    outline: none;
+    border-color: var(--secondary);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .send-button {
@@ -193,6 +216,10 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .send-button:hover {
@@ -200,35 +227,41 @@ body {
     background: linear-gradient(to right, var(--secondary), var(--accent));
 }
 
+.send-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* Social Links */
 .social-links {
-    text-align: center; /* Center text and inline elements */
-    margin-top: 2rem; /* Space above the social links */
+    text-align: center;
+    margin-top: 2rem;
 }
 
 .social-icons {
-    display: flex; /* Use Flexbox */
-    justify-content: center; /* Center the items horizontally */
-    gap: 1rem; /* Space between icons */
-    margin-top: 0.5rem; /* Space above the icons */
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
 }
 
 .social-icon {
     color: white;
-    font-size: 1.5rem; /* Icon size */
-    transition: all 0.3s ease; /* Animation on hover */
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
 }
 
 .social-icon:hover {
-    transform: scale(1.2) rotate(360deg); /* Animation on hover */
+    transform: scale(1.2) rotate(360deg);
 }
 
 .telegram:hover {
-    color: #0088cc; /* Telegram icon hover color */
+    color: #0088cc;
 }
 
 .instagram:hover {
-    color: #e1306c; /* Instagram icon hover color */
+    color: #e1306c;
 }
 
 /* Sound Button */
@@ -252,6 +285,12 @@ body {
     background: rgba(0, 0, 0, 0.7);
 }
 
+/* Footer */
+.footer-text {
+    margin-top: 2rem;
+    opacity: 0.7;
+}
+
 /* Animations */
 @keyframes spin {
     to { transform: rotate(360deg); }
@@ -262,18 +301,32 @@ body {
     50% { transform: scale(1.1); opacity: 0.5; }
 }
 
-@keyframes flicker {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    50% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.7); }
 }
 
 .glow-text {
     animation: glow 2s ease-in-out infinite;
 }
 
-@keyframes glow {
-    0%, 100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
-    50% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.7); }
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 /* Responsive Design */
@@ -288,6 +341,15 @@ body {
     }
 
     .guidelines-grid {
+        
         grid-template-columns: 1fr;
+    }
+
+    .main-title {
+        font-size: clamp(1.5rem, 4vw, 3rem);
+    }
+
+    .subtitle {
+        font-size: clamp(0.875rem, 2.5vw, 1.25rem);
     }
 }
