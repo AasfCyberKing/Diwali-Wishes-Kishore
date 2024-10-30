@@ -258,7 +258,7 @@ async function init() {
 
     } catch (error) {
         console.error('Error during initialization:', error);
-        loadingScreen.innerHTML = "Failed to load. Please refresh the page.";
+        loadingScreen.innerHTML = `Failed to load. Please refresh the page. ${error}`;
     }
 }
 
