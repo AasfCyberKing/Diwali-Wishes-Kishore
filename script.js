@@ -20,7 +20,7 @@ async function connectToMongo() {
 }
 
 // Initialize state
-let isLoading = false;
+let isLoading = true;
 let isMuted = true;
 let likes = 0; // Initialize likes count
 let hasLiked = false; // Track if the user has liked
