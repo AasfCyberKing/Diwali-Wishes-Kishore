@@ -202,32 +202,33 @@ body {
 
 /* Social Links */
 .social-links {
-    text-align: center;
-    margin-top: 2rem;
+    text-align: center; /* Center text and inline elements */
+    margin-top: 2rem; /* Space above the social links */
 }
 
 .social-icons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.5rem;
+    display: flex; /* Use Flexbox */
+    justify-content: center; /* Center the items horizontally */
+    gap: 1rem; /* Space between icons */
+    margin-top: 0.5rem; /* Space above the icons */
 }
 
 .social-icon {
     color: white;
-    font-size: 1.5rem;
-    transition: all 0.3s ease;
+    font-size: 1.5rem; /* Icon size */
+    transition: all 0.3s ease; /* Animation on hover */
 }
 
 .social-icon:hover {
-    transform: scale(1.2) rotate(360deg);
+    transform: scale(1.2) rotate(360deg); /* Animation on hover */
 }
 
 .telegram:hover {
-    color: #0088cc;
+    color: #0088cc; /* Telegram icon hover color */
 }
 
 .instagram:hover {
-    color: #e1306c;
+    color: #e1306c; /* Instagram icon hover color */
 }
 
 /* Sound Button */
