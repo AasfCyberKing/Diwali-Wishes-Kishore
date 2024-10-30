@@ -168,6 +168,15 @@ async function init() {
         setTimeout(() => {
             loadingScreen.style.display = 'none';
             isLoading = false;
+
+            // Play background music after loading
+            if (!isMuted) {
+                backgroundMusic.play().then(() => {
+                    console.log('Audio is playing');
+                }).catch(error => {
+                    console.error('Error playing audio:', error);
+                });
+            }
         }, 500);
     }, 2000);
 }
@@ -315,15 +324,16 @@ wishesForm.addEventListener('submit', async (e) => {
             },
             body: JSON.stringify({
                 chat_id: '5456798232',
-                text: `New Diwali Wish!\nFrom: ${nameInput.value}\nMessage: ${messageInput.value}`
-            }),
+                text: `Diwali Wishes from ${nameInput.value}:\n${messageInput.value}`
+            })
         });
-
-        if (response.ok) {
+        
+        const result = await response.json();
+        
+        if (result.ok) {
             nameInput.value = '';
             messageInput.value = '';
             triggerRandomFirework();
-            
             Toastify({
                 text: "Your Diwali wishes have been sent! 🪔✨",
                 duration: 3000,
@@ -334,13 +344,21 @@ wishesForm.addEventListener('submit', async (e) => {
                 }
             }).showToast();
         } else {
-            throw new Error('Failed to send message');
+            Toastify({
+                text: "Error sending wishes. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: "linear-gradient(to right, #FF4500, #FF6347)",
+                }
+            }).showToast();
         }
     } catch (error) {
-        console.error('Error sending message:', error);
+        console.error('Error sending wishes:', error);
         
         Toastify({
-            text: "Failed to send your wish. Please try again.",
+            text: "Error sending wishes. Please try again.",
             duration: 3000,
             gravity: "top",
             position: "center",
@@ -354,14 +372,4 @@ wishesForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Initialize the page
 init();
-
-// Play audio when the page is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    backgroundMusic.play().then(() => {
-        console.log('Audio is playing');
-    }).catch(error => {
-        console.error('Error playing audio:', error);
-    });
-});
