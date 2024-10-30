@@ -1,7 +1,18 @@
-// MongoDB Connection URL
-const MONGO_URL = "mongodb+srv://Shiki:xnp9czdVYgpT4KBE@shiki.smrp72r.mongodb.net/";
-const TELEGRAM_BOT_TOKEN = "6690815586:AAFh5kcrmt7Heggp-Syg66FDlGP9idUzQEI";
-const TELEGRAM_CHAT_ID = "5456798232";
+// Configuration
+const CONFIG = {
+    mongodb: {
+        appId: 'diwali-wishes-kishore',
+        clusterName: 'shiki',
+        databaseName: 'diwali',
+        likesCollection: 'likes',
+        wishesCollection: 'wishes',
+        uri: 'mongodb+srv://Shiki:xnp9czdVYgpT4KBE@shiki.smrp72r.mongodb.net/'
+    },
+    telegram: {
+        botToken: '6690815586:AAFh5kcrmt7Heggp-Syg66FDlGP9idUzQEI',
+        chatId: '5456798232'
+    }
+};
 
 // Initialize state
 let state = {
@@ -9,7 +20,9 @@ let state = {
     isMuted: true,
     likes: 0,
     hasLiked: false,
-    userId: localStorage.getItem('user-id') || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    userId: localStorage.getItem('user-id') || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    mongoClient: null,
+    db: null
 };
 
 // Save user ID if not exists
@@ -26,57 +39,47 @@ const likesCount = document.getElementById('likes-count');
 const shareBtn = document.getElementById('share-btn');
 const wishesForm = document.getElementById('wishes-form');
 
-// Send Telegram notification
-async function sendTelegramNotification(message) {
-    try {
-        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: message,
-                parse_mode: 'HTML'
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to send Telegram notification');
-        }
-    } catch (error) {
-        console.error('Error sending Telegram notification:', error);
-    }
-}
-
 // MongoDB Operations
-async function connectToMongo() {
+async function initializeMongoDB() {
     try {
-        const response = await fetch('/api/mongodb/connect', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ url: MONGO_URL })
+        // Initialize the MongoDB client
+        const { MongoClient } = require('mongodb');
+        const client = new MongoClient(CONFIG.mongodb.uri, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverApi: { version: '1', strict: true, deprecationErrors: true }
         });
-        
-        if (!response.ok) {
-            throw new Error('Failed to connect to MongoDB');
-        }
-        
+
+        // Connect to MongoDB
+        await client.connect();
         console.log('Connected to MongoDB');
+
+        // Set up database and collections
+        const db = client.db(CONFIG.mongodb.databaseName);
+        
+        // Initialize likes collection if empty
+        const likesCollection = db.collection(CONFIG.mongodb.likesCollection);
+        const likesDoc = await likesCollection.findOne({});
+        if (!likesDoc) {
+            await likesCollection.insertOne({ count: 0, users: [] });
+        }
+
+        // Store client and db in state
+        state.mongoClient = client;
+        state.db = db;
+
+        return true;
     } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
+        console.error('MongoDB initialization error:', error);
         throw error;
     }
 }
 
 async function getLikes() {
     try {
-        const response = await fetch('/api/mongodb/getLikes');
-        if (!response.ok) throw new Error('Failed to get likes');
-        const data = await response.json();
-        return data.likes || 0;
+        const collection = state.db.collection(CONFIG.mongodb.likesCollection);
+        const doc = await collection.findOne({});
+        return doc?.count || 0;
     } catch (error) {
         console.error('Error getting likes:', error);
         return 0;
@@ -85,21 +88,24 @@ async function getLikes() {
 
 async function updateLikes(increment = true) {
     try {
-        const response = await fetch('/api/mongodb/updateLikes', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId: state.userId,
-                increment
-            })
-        });
-        
-        if (!response.ok) throw new Error('Failed to update likes');
-        
-        const data = await response.json();
-        return data.likes;
+        const collection = state.db.collection(CONFIG.mongodb.likesCollection);
+        const update = increment
+            ? { 
+                $inc: { count: 1 },
+                $addToSet: { users: state.userId }
+              }
+            : { 
+                $inc: { count: -1 },
+                $pull: { users: state.userId }
+              };
+
+        const result = await collection.findOneAndUpdate(
+            {},
+            update,
+            { returnDocument: 'after', upsert: true }
+        );
+
+        return result.value.count;
     } catch (error) {
         console.error('Error updating likes:', error);
         throw error;
@@ -108,27 +114,54 @@ async function updateLikes(increment = true) {
 
 async function checkUserLiked() {
     try {
-        const response = await fetch('/api/mongodb/checkUserLiked', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId: state.userId
-            })
-        });
-        
-        if (!response.ok) throw new Error('Failed to check user liked status');
-        
-        const data = await response.json();
-        return data.hasLiked;
+        const collection = state.db.collection(CONFIG.mongodb.likesCollection);
+        const doc = await collection.findOne({ users: state.userId });
+        return !!doc;
     } catch (error) {
         console.error('Error checking user liked status:', error);
         return false;
     }
 }
 
-// Toast notification function
+async function saveWish(name, message) {
+    try {
+        const collection = state.db.collection(CONFIG.mongodb.wishesCollection);
+        await collection.insertOne({
+            userId: state.userId,
+            name,
+            message,
+            timestamp: new Date()
+        });
+    } catch (error) {
+        console.error('Error saving wish:', error);
+        throw error;
+    }
+}
+
+// Telegram Notifications
+async function sendTelegramNotification(message) {
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${CONFIG.telegram.botToken}/sendMessage`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: CONFIG.telegram.chatId,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to send Telegram notification');
+        }
+    } catch (error) {
+        console.error('Error sending Telegram notification:', error);
+    }
+}
+
+// UI Functions
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -144,7 +177,7 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Initialize particles
+// Particle Effects
 async function initParticles() {
     try {
         await tsParticles.load("fireworks", {
@@ -210,7 +243,6 @@ async function initParticles() {
     }
 }
 
-// Trigger random firework effect
 function triggerRandomFirework() {
     if (state.isLoading) return;
     
@@ -228,8 +260,8 @@ function triggerRandomFirework() {
 // Initialize the page
 async function init() {
     try {
-        // Connect to MongoDB
-        await connectToMongo();
+        // Initialize MongoDB
+        await initializeMongoDB();
         
         // Initialize particles
         await initParticles();
@@ -258,7 +290,15 @@ async function init() {
 
     } catch (error) {
         console.error('Error during initialization:', error);
-        loadingScreen.innerHTML = `Failed to load. Please refresh the page. ${error}`;
+        loadingScreen.innerHTML = `
+            <div class="error-message">
+                Failed to load. Please refresh the page.<br>
+                <small>${error.message}</small>
+                <button onclick="window.location.reload()" class="retry-button">
+                    Retry
+                </button>
+            </div>
+        `;
     }
 }
 
@@ -343,25 +383,21 @@ wishesForm.addEventListener('submit', async (e) => {
     sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     
     try {
-        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: `Diwali Wishes from ${nameInput.value}:\n${messageInput.value}`
-            })
-        });
+        // Save wish to MongoDB
+        await saveWish(nameInput.value, messageInput.value);
         
-        if (response.ok) {
-            nameInput.value = '';
-            messageInput.value = '';
-            triggerRandomFirework();
-            showToast("Your Diwali wishes have been sent! 🪔✨");
-        } else {
-            throw new Error('Failed to send message');
-        }
+        // Send to Telegram
+        await sendTelegramNotification(
+            `🪔 New Diwali Wish!\n\n` +
+            `From: ${nameInput.value}\n` +
+            `Message: ${messageInput.value}\n` +
+            `User ID: ${state.userId}`
+        );
+        
+        nameInput.value = '';
+        messageInput.value = '';
+        triggerRandomFirework();
+        showToast("Your Diwali wishes have been sent! 🪔✨");
     } catch (error) {
         console.error('Error sending wishes:', error);
         showToast("Error sending wishes. Please try again.", "error");
@@ -371,12 +407,19 @@ wishesForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Handle page visibility change to manage audio
+// Handle page visibility change
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         backgroundMusic.pause();
     } else if (!state.isMuted) {
         backgroundMusic.play().catch(console.error);
+    }
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', async () => {
+    if (state.mongoClient) {
+        await state.mongoClient.close();
     }
 });
 
